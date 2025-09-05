@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import javax.validation.Valid;
 import java.time.LocalDate;
 import java.util.*;
 
@@ -18,12 +19,14 @@ public class FilmController {
 
     @GetMapping
     public Collection<Film> getAllFilms() {
+        log.info("Получен запрос на получение всех фильмов");
         return films.values();
     }
 
     @PostMapping
-    public Film addFilm(@RequestBody Film film) {
-        validateFilm(film);
+    public Film addFilm(@Valid @RequestBody Film film) {
+        log.info("Получен запрос на добавление фильма: {}", film);
+        validateReleaseDate(film);
         film.setId(nextId++);
         films.put(film.getId(), film);
         log.info("Фильм добавлен: {}", film);
@@ -31,11 +34,12 @@ public class FilmController {
     }
 
     @PutMapping
-    public Film updateFilm(@RequestBody Film film) {
+    public Film updateFilm(@Valid @RequestBody Film film) {
+        log.info("Получен запрос на обновление фильма: {}", film);
         if (!films.containsKey(film.getId())) {
             throw new ValidationException("Фильм с id=" + film.getId() + " не найден.");
         }
-        validateFilm(film);
+        validateReleaseDate(film);
         films.put(film.getId(), film);
         log.info("Фильм обновлён: {}", film);
         return film;
@@ -57,3 +61,4 @@ public class FilmController {
     }
 
 }
+
