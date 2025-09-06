@@ -46,12 +46,6 @@ public class UserController {
         return user;
     }
 
-    private void setUserNameIfBlank(User user) {
-        if (user.getName() == null || user.getName().isBlank()) {
-            user.setName(user.getLogin());
-        }
-    }
-
     private void validateUser(User user) {
         if (user.getEmail() == null || user.getEmail().isBlank() || !user.getEmail().contains("@")) {
             throw new ValidationException("Некорректный email.");
@@ -65,4 +59,5 @@ public class UserController {
     }
 
 }
+
 
