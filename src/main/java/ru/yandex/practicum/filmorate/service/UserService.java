@@ -48,9 +48,8 @@ public class UserService {
     }
 
     public void removeFriend(int userId, int friendId) {
-
         getUserById(userId);
-    getUserById(friendId); 
+        getUserById(friendId);
         
         if (friends.containsKey(userId)) {
             friends.get(userId).remove(friendId);
@@ -78,7 +77,4 @@ public class UserService {
                 .map(this::getUserById)
                 .collect(Collectors.toList());
     }
-
 }
-
-
