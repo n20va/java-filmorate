@@ -41,10 +41,17 @@ public class FilmService {
 
     public void addLike(int filmId, int userId) {
         getFilmById(filmId);
+    if (userStorage.getUserById(userId) == null) {
+        throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+    }
         likes.computeIfAbsent(filmId, k -> new HashSet<>()).add(userId);
     }
 
     public void removeLike(int filmId, int userId) {
+        getFilmById(filmId);
+    if (userStorage.getUserById(userId) == null) {
+        throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+    }
         if (likes.containsKey(filmId)) {
             likes.get(filmId).remove(userId);
         }
@@ -62,3 +69,4 @@ public class FilmService {
     }
 
 }
+
