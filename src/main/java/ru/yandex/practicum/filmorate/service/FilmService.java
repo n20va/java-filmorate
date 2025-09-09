@@ -5,17 +5,20 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
-import java.util.*;
-import java.util.stream.Collectors;
+import ru.yandex.practicum.filmorate.storage.UserStorage;
+import java.util.List;
+import java.util.Set;
+import java.util.HashSet;
 
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
-    private final Map<Integer, Set<Integer>> likes = new HashMap<>();
+    private final UserStorage userStorage;
 
     @Autowired
-    public FilmService(FilmStorage filmStorage) {
+    public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
         this.filmStorage = filmStorage;
+        this.userStorage = userStorage;
     }
 
     public Film addFilm(Film film) {
@@ -23,7 +26,6 @@ public class FilmService {
     }
 
     public Film updateFilm(Film film) {
-        Film existingFilm = getFilmById(film.getId());
         return filmStorage.updateFilm(film);
     }
 
@@ -40,35 +42,43 @@ public class FilmService {
     }
 
     public void addLike(int filmId, int userId) {
-        getFilmById(filmId);
-    if (userStorage.getUserById(userId) == null) {
-        throw new NotFoundException("Пользователь с id=" + userId + " не найден");
-    }
-        likes.computeIfAbsent(filmId, k -> new HashSet<>()).add(userId);
+        Film film = getFilmById(filmId);
+        
+        if (userStorage.getUserById(userId) == null) {
+            throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+        }
+        
+        Set<Integer> likes = film.getLikes();
+        if (likes == null) {
+            likes = new HashSet<>();
+            film.setLikes(likes);
+        }
+        likes.add(userId);
     }
 
     public void removeLike(int filmId, int userId) {
-        getFilmById(filmId);
-    if (userStorage.getUserById(userId) == null) {
-        throw new NotFoundException("Пользователь с id=" + userId + " не найден");
-    }
-        if (likes.containsKey(filmId)) {
-            likes.get(filmId).remove(userId);
+        Film film = getFilmById(filmId);
+        
+        if (userStorage.getUserById(userId) == null) {
+            throw new NotFoundException("Пользователь с id=" + userId + " не найден");
+        }
+        
+        Set<Integer> likes = film.getLikes();
+        if (likes != null) {
+            likes.remove(userId);
         }
     }
 
     public List<Film> getPopularFilms(int count) {
-        return filmStorage.getAllFilms().stream()
-                .sorted((f1, f2) -> {
-                    int likesCount1 = likes.getOrDefault(f1.getId(), Collections.emptySet()).size();
-                    int likesCount2 = likes.getOrDefault(f2.getId(), Collections.emptySet()).size();
-                    return Integer.compare(likesCount2, likesCount1);
-                })
+        List<Film> films = getAllFilms();
+        films.sort((f1, f2) -> {
+            int likes1 = f1.getLikes() != null ? f1.getLikes().size() : 0;
+            int likes2 = f2.getLikes() != null ? f2.getLikes().size() : 0;
+            return Integer.compare(likes2, likes1);
+        });
+        
+        return films.stream()
                 .limit(count)
-                .collect(Collectors.toList());
+                .collect(java.util.stream.Collectors.toList());
     }
-
 }
-
-
-
