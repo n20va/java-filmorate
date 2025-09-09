@@ -42,10 +42,13 @@
 
 
         <!-- Add this validation dependency -->
+
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-validation</artifactId>
+            <artifactId>spring-boot-starter-web</artifactId>
+
         </dependency>
+
 
 
         <!-- Lombok -->
@@ -66,6 +69,7 @@
             <artifactId>logbook-spring-boot-starter</artifactId>
             <version>3.7.2</version>
         </dependency>
+
 
     </dependencies>
 

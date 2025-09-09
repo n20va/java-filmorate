@@ -8,6 +8,7 @@ import ru.yandex.practicum.filmorate.service.FilmService;
 import javax.validation.Valid;
 import java.util.List;
 
+
 @Slf4j
 @RestController
 @RequestMapping("/films")
@@ -22,15 +23,18 @@ public class FilmController {
     @GetMapping
     public List<Film> getAllFilms() {
         return filmService.getAllFilms();
+
     }
 
     @PostMapping
     public Film addFilm(@Valid @RequestBody Film film) {
         return filmService.addFilm(film);
+
     }
 
     @PutMapping
     public Film updateFilm(@Valid @RequestBody Film film) {
+
         return filmService.updateFilm(film);
     }
 

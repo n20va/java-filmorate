@@ -4,11 +4,13 @@ import lombok.Data;
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotBlank;
 import javax.validation.constraints.PastOrPresent;
+
 import java.time.LocalDate;
 
 @Data
 public class User {
     private int id;
+
 
     @NotBlank(message = "Email не может быть пустым")
     @Email(message = "Email должен быть корректным адресом")
@@ -22,3 +24,4 @@ public class User {
     @PastOrPresent(message = "Дата рождения не может быть в будущем")
     private LocalDate birthday;
 }
+
