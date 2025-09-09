@@ -50,6 +50,7 @@ public class UserService {
     public void removeFriend(int userId, int friendId) {
         getUserById(userId);
         getUserById(friendId);
+        
         if (friends.containsKey(userId)) {
             friends.get(userId).remove(friendId);
         }
@@ -59,6 +60,8 @@ public class UserService {
     }
 
     public List<User> getFriends(int userId) {
+        getUserById(userId);
+        
         if (!friends.containsKey(userId)) {
             return new ArrayList<>();
         }
@@ -77,4 +80,3 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 }
-
