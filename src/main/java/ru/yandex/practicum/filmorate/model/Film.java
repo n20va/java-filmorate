@@ -1,6 +1,6 @@
 package ru.yandex.practicum.filmorate.model;
 
-import javax.validation.constraints.*;
+import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -118,3 +118,4 @@ public class Film {
                 '}';
     }
 }
+
