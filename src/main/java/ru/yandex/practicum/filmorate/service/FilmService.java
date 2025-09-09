@@ -6,14 +6,13 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
-    private final Map<Integer, Set<Integer>> filmLikes = new HashMap<>();
 
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
@@ -26,6 +25,10 @@ public class FilmService {
     }
 
     public Film updateFilm(Film film) {
+        Film existingFilm = filmStorage.getFilmById(film.getId());
+        if (existingFilm == null) {
+            throw new NotFoundException("Фильм с id=" + film.getId() + " не найден");
+        }
         return filmStorage.updateFilm(film);
     }
 
@@ -42,31 +45,24 @@ public class FilmService {
     }
 
     public void addLike(int filmId, int userId) {
-        getFilmById(filmId);
+        Film film = getFilmById(filmId);
         if (userStorage.getUserById(userId) == null) {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
-        filmLikes.computeIfAbsent(filmId, k -> new HashSet<>()).add(userId);
+        film.addLike(userId);
     }
 
     public void removeLike(int filmId, int userId) {
-        getFilmById(filmId);
+        Film film = getFilmById(filmId);
         if (userStorage.getUserById(userId) == null) {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
-        if (filmLikes.containsKey(filmId)) {
-            filmLikes.get(filmId).remove(userId);
-        }
+        film.removeLike(userId);
     }
 
     public List<Film> getPopularFilms(int count) {
-        List<Film> films = getAllFilms();
-        films.sort((f1, f2) -> {
-            int likes1 = filmLikes.getOrDefault(f1.getId(), Collections.emptySet()).size();
-            int likes2 = filmLikes.getOrDefault(f2.getId(), Collections.emptySet()).size();
-            return Integer.compare(likes2, likes1);
-        });
-        return films.stream()
+        return filmStorage.getAllFilms().stream()
+                .sorted((f1, f2) -> Integer.compare(f2.getLikesCount(), f1.getLikesCount()))
                 .limit(count)
                 .collect(Collectors.toList());
     }
