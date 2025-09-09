@@ -1,6 +1,5 @@
 package ru.yandex.practicum.filmorate.model;
 
-import jakarta.validation.constraints.*;
 import java.time.LocalDate;
 import java.util.HashSet;
 import java.util.Set;
@@ -8,18 +7,10 @@ import java.util.Objects;
 
 public class Film {
     private int id;
-
-    @NotBlank(message = "Название фильма не может быть пустым")
     private String name;
-
-    @Size(max = 200, message = "Максимальная длина описания — 200 символов")
     private String description;
-
     private LocalDate releaseDate;
-
-    @Positive(message = "Продолжительность фильма должна быть положительным числом")
     private int duration;
-
     private Set<Integer> likes = new HashSet<>();
 
     public Film() {
@@ -31,6 +22,10 @@ public class Film {
         this.description = description;
         this.releaseDate = releaseDate;
         this.duration = duration;
+    }
+
+    public static FilmBuilder builder() {
+        return new FilmBuilder();
     }
 
     public int getId() {
@@ -117,5 +112,47 @@ public class Film {
                 ", likes=" + likes +
                 '}';
     }
-}
 
+    public static class FilmBuilder {
+        private int id;
+        private String name;
+        private String description;
+        private LocalDate releaseDate;
+        private int duration;
+
+        public FilmBuilder id(int id) {
+            this.id = id;
+            return this;
+        }
+
+        public FilmBuilder name(String name) {
+            this.name = name;
+            return this;
+        }
+
+        public FilmBuilder description(String description) {
+            this.description = description;
+            return this;
+        }
+
+        public FilmBuilder releaseDate(LocalDate releaseDate) {
+            this.releaseDate = releaseDate;
+            return this;
+        }
+
+        public FilmBuilder duration(int duration) {
+            this.duration = duration;
+            return this;
+        }
+
+        public Film build() {
+            Film film = new Film();
+            film.setId(id);
+            film.setName(name);
+            film.setDescription(description);
+            film.setReleaseDate(releaseDate);
+            film.setDuration(duration);
+            return film;
+        }
+    }
+}
