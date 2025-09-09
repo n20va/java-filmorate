@@ -6,15 +6,14 @@ import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
-import java.util.List;
-import java.util.Set;
-import java.util.HashSet;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final Map<Integer, Set<Integer>> filmLikes = new HashMap<>();
 
     @Autowired
     public FilmService(FilmStorage filmStorage, UserStorage userStorage) {
@@ -43,34 +42,28 @@ public class FilmService {
     }
 
     public void addLike(int filmId, int userId) {
-        Film film = getFilmById(filmId);
+        getFilmById(filmId);
         if (userStorage.getUserById(userId) == null) {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
-        Set<Integer> likes = film.getLikes();
-        if (likes == null) {
-            likes = new HashSet<>();
-            film.setLikes(likes);
-        }
-        likes.add(userId);
+        filmLikes.computeIfAbsent(filmId, k -> new HashSet<>()).add(userId);
     }
 
     public void removeLike(int filmId, int userId) {
-        Film film = getFilmById(filmId);
+        getFilmById(filmId);
         if (userStorage.getUserById(userId) == null) {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
-        Set<Integer> likes = film.getLikes();
-        if (likes != null) {
-            likes.remove(userId);
+        if (filmLikes.containsKey(filmId)) {
+            filmLikes.get(filmId).remove(userId);
         }
     }
 
     public List<Film> getPopularFilms(int count) {
         List<Film> films = getAllFilms();
         films.sort((f1, f2) -> {
-            int likes1 = f1.getLikes() != null ? f1.getLikes().size() : 0;
-            int likes2 = f2.getLikes() != null ? f2.getLikes().size() : 0;
+            int likes1 = filmLikes.getOrDefault(f1.getId(), Collections.emptySet()).size();
+            int likes2 = filmLikes.getOrDefault(f2.getId(), Collections.emptySet()).size();
             return Integer.compare(likes2, likes1);
         });
         return films.stream()
