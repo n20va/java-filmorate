@@ -9,6 +9,7 @@ import ru.yandex.practicum.filmorate.storage.UserStorage;
 import java.util.List;
 import java.util.Set;
 import java.util.HashSet;
+import java.util.stream.Collectors;
 
 @Service
 public class FilmService {
@@ -43,11 +44,9 @@ public class FilmService {
 
     public void addLike(int filmId, int userId) {
         Film film = getFilmById(filmId);
-        
         if (userStorage.getUserById(userId) == null) {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
-        
         Set<Integer> likes = film.getLikes();
         if (likes == null) {
             likes = new HashSet<>();
@@ -58,11 +57,9 @@ public class FilmService {
 
     public void removeLike(int filmId, int userId) {
         Film film = getFilmById(filmId);
-        
         if (userStorage.getUserById(userId) == null) {
             throw new NotFoundException("Пользователь с id=" + userId + " не найден");
         }
-        
         Set<Integer> likes = film.getLikes();
         if (likes != null) {
             likes.remove(userId);
@@ -76,9 +73,8 @@ public class FilmService {
             int likes2 = f2.getLikes() != null ? f2.getLikes().size() : 0;
             return Integer.compare(likes2, likes1);
         });
-        
         return films.stream()
                 .limit(count)
-                .collect(java.util.stream.Collectors.toList());
+                .collect(Collectors.toList());
     }
 }
