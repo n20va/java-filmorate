@@ -23,6 +23,7 @@ public class UserService {
     }
 
     public User updateUser(User user) {
+        getUserById(user.getId());
         return userStorage.updateUser(user);
     }
 
@@ -79,4 +80,5 @@ public class UserService {
     }
 
 }
+
 
