@@ -19,11 +19,12 @@ public class GlobalExceptionHandler {
         return new ErrorResponse(e.getMessage());
     }
 
-    @ExceptionHandler(ValidationException.class)
+    @ExceptionHandler(MethodArgumentNotValidException.class)
     @ResponseStatus(HttpStatus.BAD_REQUEST)
-    public ErrorResponse handleValidationException(final ValidationException e) {
-        log.warn("ValidationException: {}", e.getMessage());
-        return new ErrorResponse(e.getMessage());
+    public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
+        String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
+        log.warn("Validation error: {}", errorMessage);
+        return new ErrorResponse(errorMessage);
     }
 
     @ExceptionHandler(Throwable.class)
@@ -33,3 +34,4 @@ public class GlobalExceptionHandler {
         return new ErrorResponse("Произошла непредвиденная ошибка.");
     }
 }
+
