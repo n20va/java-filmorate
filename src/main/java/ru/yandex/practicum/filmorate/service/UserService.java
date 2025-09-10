@@ -85,10 +85,10 @@ public class UserService {
     public List<User> getCommonFriends(int userId, int otherId) {
         Set<Integer> userFriends = friends.getOrDefault(userId, new HashSet<>());
         Set<Integer> otherFriends = friends.getOrDefault(otherId, new HashSet<>());
-        
         return userFriends.stream()
                 .filter(otherFriends::contains)
                 .map(this::getUserOrThrow)
                 .collect(Collectors.toList());
     }
 }
+
