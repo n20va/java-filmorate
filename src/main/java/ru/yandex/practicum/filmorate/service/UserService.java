@@ -74,6 +74,7 @@ public class UserService {
     }
 
     public List<User> getFriends(int userId) {
+        getUserOrThrow(userId);
         if (!friends.containsKey(userId)) {
             return new ArrayList<>();
         }
@@ -83,6 +84,8 @@ public class UserService {
     }
 
     public List<User> getCommonFriends(int userId, int otherId) {
+        getUserOrThrow(userId);
+        getUserOrThrow(otherId);
         Set<Integer> userFriends = friends.getOrDefault(userId, new HashSet<>());
         Set<Integer> otherFriends = friends.getOrDefault(otherId, new HashSet<>());
         return userFriends.stream()
@@ -91,4 +94,3 @@ public class UserService {
                 .collect(Collectors.toList());
     }
 }
-
