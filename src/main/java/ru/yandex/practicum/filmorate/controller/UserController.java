@@ -5,9 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import ru.yandex.practicum.filmorate.model.User;
 import ru.yandex.practicum.filmorate.service.UserService;
-import jakarta.validation.Valid;
 import java.util.List;
-
 
 @Slf4j
 @RestController
@@ -23,18 +21,16 @@ public class UserController {
     @GetMapping
     public List<User> getAllUsers() {
         return userService.getAllUsers();
-
     }
 
     @PostMapping
-    public User addUser(@Valid @RequestBody User user) {
+    public User addUser(@RequestBody User user) {
         setUserNameIfBlank(user);
         return userService.addUser(user);
-
     }
 
     @PutMapping
-    public User updateUser(@Valid @RequestBody User user) {
+    public User updateUser(@RequestBody User user) {
         setUserNameIfBlank(user);
         return userService.updateUser(user);
     }
@@ -62,7 +58,6 @@ public class UserController {
     @GetMapping("/{id}/friends/common/{otherId}")
     public List<User> getCommonFriends(@PathVariable int id, @PathVariable int otherId) {
         return userService.getCommonFriends(id, otherId);
-
     }
 
     private void setUserNameIfBlank(User user) {
@@ -71,4 +66,3 @@ public class UserController {
         }
     }
 }
-
