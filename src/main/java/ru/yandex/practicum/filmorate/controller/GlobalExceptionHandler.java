@@ -34,4 +34,6 @@ public class GlobalExceptionHandler {
         log.warn("Validation error: {}", errorMessage);
         return new ErrorResponse(errorMessage);
     }
+}
+
 
