@@ -32,4 +32,6 @@ public class GlobalExceptionHandler {
     public ErrorResponse handleMethodArgumentNotValidException(final MethodArgumentNotValidException e) {
         String errorMessage = e.getBindingResult().getAllErrors().get(0).getDefaultMessage();
         log.warn("Validation error: {}", errorMessage);
-        return new ErrorResponse(error
+        return new ErrorResponse(errorMessage);
+    }
+
