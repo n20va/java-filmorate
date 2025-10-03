@@ -137,6 +137,11 @@ public class FilmDbStorage implements FilmStorage {
         loadFilmGenres(film);
         return Optional.of(film);
     }
+    
+    @Override
+    public RowMapper<Film> getFilmRowMapper() {
+        return filmRowMapper;
+    }
 
     private void loadFilmMpa(Film film) {
         String sql = "SELECT mpa_id FROM films WHERE film_id = ?";
@@ -160,4 +165,5 @@ public class FilmDbStorage implements FilmStorage {
         film.setGenres(new LinkedHashSet<>(genres));
     }
 }
+
 
