@@ -27,7 +27,6 @@ class FilmDbStorageTest {
 
     @Test
     void testFindFilmById() {
-        // Создание тестового фильма
         Film film = Film.builder()
                 .name("Test Film")
                 .description("Test Description")

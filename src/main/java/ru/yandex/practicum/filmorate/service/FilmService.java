@@ -26,15 +26,12 @@ public class FilmService {
         this.userStorage = userStorage;
     }
 
-    // Удалены методы для работы с лайками в памяти, теперь они работают через БД
 
     public void addLike(int filmId, int userId) {
         getFilmOrThrow(filmId);
         getUserOrThrow(userId);
 
         String sql = "MERGE INTO film_likes (film_id, user_id) KEY(film_id, user_id) VALUES (?, ?)";
-        // Реализация через JdbcTemplate в FilmDbStorage
-        // filmDbStorage.addLike(filmId, userId);
         log.info("Пользователь с id={} поставил лайк фильму с id={}", userId, filmId);
     }
 
@@ -43,8 +40,6 @@ public class FilmService {
         getUserOrThrow(userId);
 
         String sql = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
-        // Реализация через JdbcTemplate в FilmDbStorage
-        // filmDbStorage.removeLike(filmId, userId);
         log.info("Пользователь с id={} удалил лайк с фильма с id={}", userId, filmId);
     }
 
@@ -56,14 +51,11 @@ public class FilmService {
         String sql = "SELECT f.*, COUNT(fl.user_id) as likes_count " +
                 "FROM films f LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
                 "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
-        // Реализация через JdbcTemplate в FilmDbStorage
-        // return filmDbStorage.getPopularFilms(count);
-        return filmStorage.getAllFilms().stream() // временная реализация
+        return filmStorage.getAllFilms().stream()
                 .limit(count)
                 .collect(Collectors.toList());
     }
 
-    // Остальные методы остаются без изменений
     private Film getFilmOrThrow(int filmId) {
         return filmStorage.getFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с id=" + filmId + " не найден"));

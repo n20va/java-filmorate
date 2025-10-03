@@ -33,10 +33,8 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(rs.getInt("duration"))
                 .build();
 
-        // Загрузка MPA рейтинга будет выполнена отдельно
         Integer mpaId = rs.getInt("mpa_id");
         if (mpaId != 0) {
-            // MPA будет загружен позже в отдельном методе
         }
 
         return film;
@@ -64,7 +62,6 @@ public class FilmDbStorage implements FilmStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            // Явно указываем, что нас интересует только film_id
             PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"film_id"});
             stmt.setString(1, film.getName());
             stmt.setString(2, film.getDescription());
@@ -78,11 +75,9 @@ public class FilmDbStorage implements FilmStorage {
             return stmt;
         }, keyHolder);
 
-        // Получаем ID безопасным способом
         int filmId = Objects.requireNonNull(keyHolder.getKey()).intValue();
         film.setId(filmId);
 
-        // Сохранение жанров
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             String genreSql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
             for (Genre genre : film.getGenres()) {
@@ -104,7 +99,6 @@ public class FilmDbStorage implements FilmStorage {
                 film.getMpa() != null ? film.getMpa().getId() : null,
                 film.getId());
 
-        // Обновление жанров
         jdbcTemplate.update("DELETE FROM film_genres WHERE film_id = ?", film.getId());
         if (film.getGenres() != null && !film.getGenres().isEmpty()) {
             String genreSql = "INSERT INTO film_genres (film_id, genre_id) VALUES (?, ?)";
@@ -121,7 +115,6 @@ public class FilmDbStorage implements FilmStorage {
         String sql = "SELECT * FROM films";
         List<Film> films = jdbcTemplate.query(sql, filmRowMapper);
 
-        // Загрузка MPA и жанров для каждого фильма
         films.forEach(film -> {
             loadFilmMpa(film);
             loadFilmGenres(film);
@@ -155,7 +148,6 @@ public class FilmDbStorage implements FilmStorage {
                 MpaRating mpa = jdbcTemplate.queryForObject(mpaSql, mpaRowMapper, mpaId);
                 film.setMpa(mpa);
             } catch (Exception e) {
-                // Если MPA не найден, оставляем null
             }
         }
     }
