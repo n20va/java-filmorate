@@ -55,7 +55,6 @@ public class FilmService {
         String sql = "SELECT f.* FROM films f " +
                 "LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
                 "GROUP BY f.film_id ORDER BY COUNT(fl.user_id) DESC LIMIT ?";
-        
         return jdbcTemplate.query(sql, filmStorage.getFilmRowMapper(), count);
     }
 
@@ -90,3 +89,4 @@ public class FilmService {
         return getFilmOrThrow(id);
     }
 }
+
