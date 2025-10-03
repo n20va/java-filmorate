@@ -70,7 +70,7 @@
         </dependency>
 
          <dependency>
-             <groupld>org.springframework.boot</groupld>
+             <groupId>org.springframework.boot</groupld>
              <artifactld>spring-boot-starter-actuator</artifactld>
          </dependency>
              
