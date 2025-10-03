@@ -36,8 +36,6 @@ public class FilmDbStorage implements FilmStorage {
                 .releaseDate(rs.getDate("release_date").toLocalDate())
                 .duration(rs.getInt("duration"))
                 .build();
-
-        // MPA будет загружен позже в отдельном методе
         return film;
     };
 
@@ -143,7 +141,6 @@ public class FilmDbStorage implements FilmStorage {
     private void loadFilmMpa(Film film) {
         String sql = "SELECT mpa_id FROM films WHERE film_id = ?";
         Integer mpaId = jdbcTemplate.queryForObject(sql, Integer.class, film.getId());
-        
         if (mpaId != null && mpaId != 0) {
             String mpaSql = "SELECT * FROM mpa_ratings WHERE mpa_id = ?";
             try {
@@ -163,3 +160,4 @@ public class FilmDbStorage implements FilmStorage {
         film.setGenres(new LinkedHashSet<>(genres));
     }
 }
+
