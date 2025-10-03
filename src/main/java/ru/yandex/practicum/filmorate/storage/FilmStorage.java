@@ -1,19 +1,20 @@
 package ru.yandex.practicum.filmorate.storage;
 
-import ru.yandex.practicum.filmorate.model.User;
+import ru.yandex.practicum.filmorate.model.Film;
+import org.springframework.jdbc.core.RowMapper;
+
 import java.util.List;
 import java.util.Optional;
 
-public interface UserStorage {
-    User addUser(User user);
+public interface FilmStorage {
 
-    User updateUser(User user);
+    Film addFilm(Film film);
 
-    List<User> getAllUsers();
+    Film updateFilm(Film film);
 
-    Optional<User> getUserById(int id);
-    void addFriend(int userId, int friendId);
-    void removeFriend(int userId, int friendId);
-    List<User> getFriends(int userId);
-    List<User> getCommonFriends(int userId, int otherId);
+    List<Film> getAllFilms();
+
+    Optional<Film> getFilmById(int id);
+
+    RowMapper<Film> getFilmRowMapper();
 }
