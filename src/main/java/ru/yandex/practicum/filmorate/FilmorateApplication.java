@@ -7,7 +7,6 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Slf4j
 @SpringBootApplication
 public class FilmorateApplication {
-    
     public static void main(String[] args) {
         log.info("=== STARTING FILMORATE APPLICATION ===");
         try {
@@ -19,3 +18,4 @@ public class FilmorateApplication {
         }
     }
 }
+
