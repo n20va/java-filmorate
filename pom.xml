@@ -69,7 +69,7 @@
             <version>${gson.version}</version>
         </dependency>
 
-         ‹dependency>
+         <dependency>
              <groupld>org.springframework.boot</groupld>
              <artifactld>spring-boot-starter-actuator</artifactld>
          </dependency>
