@@ -18,7 +18,7 @@ import java.util.Objects;
 public class UserDbStorage implements UserStorage {
 
     private final JdbcTemplate jdbcTemplate;
-    
+
     @Autowired
     public UserDbStorage(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
@@ -30,21 +30,21 @@ public class UserDbStorage implements UserStorage {
         user.setEmail(rs.getString("email"));
         user.setLogin(rs.getString("login"));
         user.setName(rs.getString("name"));
-        
+
         Date birthday = rs.getDate("birthday");
         if (birthday != null) {
             user.setBirthday(birthday.toLocalDate());
         }
-        
+
         return user;
     };
 
     @Override
     public User addUser(User user) {
         String sql = "INSERT INTO users (email, login, name, birthday) VALUES (?, ?, ?, ?)";
-        
+
         KeyHolder keyHolder = new GeneratedKeyHolder();
-        
+
         jdbcTemplate.update(connection -> {
             PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"user_id"});
             stmt.setString(1, user.getEmail());
@@ -53,23 +53,23 @@ public class UserDbStorage implements UserStorage {
             stmt.setDate(4, user.getBirthday() != null ? Date.valueOf(user.getBirthday()) : null);
             return stmt;
         }, keyHolder);
-        
+
         int userId = Objects.requireNonNull(keyHolder.getKey()).intValue();
         user.setId(userId);
-        
+
         return getUserById(userId).orElse(user);
     }
 
     @Override
     public User updateUser(User user) {
         String sql = "UPDATE users SET email = ?, login = ?, name = ?, birthday = ? WHERE user_id = ?";
-        jdbcTemplate.update(sql, 
+        jdbcTemplate.update(sql,
                 user.getEmail(),
                 user.getLogin(),
                 user.getName(),
                 user.getBirthday() != null ? Date.valueOf(user.getBirthday()) : null,
                 user.getId());
-        
+
         return getUserById(user.getId()).orElse(user);
     }
 
