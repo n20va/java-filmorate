@@ -10,9 +10,14 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.model.Genre;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
+import java.sql.Types;
 import java.sql.Date;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.LinkedHashSet;
+import java.util.Objects;
+
 
 @Repository("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
@@ -90,7 +95,8 @@ public class FilmDbStorage implements FilmStorage {
 
     @Override
     public Film updateFilm(Film film) {
-        String sql = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? WHERE film_id = ?";
+        String sql = "UPDATE films SET name = ?, description = ?, release_date = ?, duration = ?, mpa_id = ? "
+                + "WHERE film_id = ?";
         jdbcTemplate.update(sql,
                 film.getName(),
                 film.getDescription(),
@@ -153,9 +159,9 @@ public class FilmDbStorage implements FilmStorage {
     }
 
     private void loadFilmGenres(Film film) {
-        String sql = "SELECT g.* FROM genres g " +
-                "JOIN film_genres fg ON g.genre_id = fg.genre_id " +
-                "WHERE fg.film_id = ? ORDER BY g.genre_id";
+        String sql = "SELECT g.* FROM genres g "
+                + "JOIN film_genres fg ON g.genre_id = fg.genre_id "
+                + "WHERE fg.film_id = ? ORDER BY g.genre_id";
         List<Genre> genres = jdbcTemplate.query(sql, genreRowMapper, film.getId());
         film.setGenres(new LinkedHashSet<>(genres));
     }

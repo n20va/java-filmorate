@@ -7,11 +7,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
 import java.sql.Date;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Objects;
 
 @Repository("userDbStorage")
 public class UserDbStorage implements UserStorage {
@@ -45,7 +46,7 @@ public class UserDbStorage implements UserStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"user_id"});
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getLogin());
             stmt.setString(3, user.getName());
@@ -53,7 +54,7 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
 
-        int userId = keyHolder.getKey().intValue();
+        int userId = Objects.requireNonNull(keyHolder.getKey()).intValue();
         user.setId(userId);
 
         return getUserById(userId).orElse(user);
