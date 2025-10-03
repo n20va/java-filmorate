@@ -10,7 +10,7 @@ import static org.junit.jupiter.api.Assertions.*;
 public class FilmValidationTest {
     private Film validFilm;
 
-    @BeforeEach
+      @BeforeEach
     void setUp() {
         validFilm = Film.builder()
                 .name("Valid Film")
