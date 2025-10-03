@@ -7,9 +7,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 @Slf4j
 @SpringBootApplication
 public class FilmorateApplication {
+    
     public static void main(String[] args) {
-        log.info("Starting Filmorate Application...");
-        SpringApplication.run(FilmorateApplication.class, args);
-        log.info("Filmorate Application started successfully on port 8080");
+        log.info("=== STARTING FILMORATE APPLICATION ===");
+        try {
+            SpringApplication.run(FilmorateApplication.class, args);
+            log.info("=== FILMORATE APPLICATION STARTED SUCCESSFULLY ===");
+        } catch (Exception e) {
+            log.error("=== FILMORATE APPLICATION FAILED TO START ===", e);
+            throw e;
+        }
     }
 }
