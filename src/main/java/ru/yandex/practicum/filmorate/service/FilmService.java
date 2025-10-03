@@ -20,7 +20,7 @@ public class FilmService {
     private final Map<Integer, Set<Integer>> likes = new HashMap<>();
 
     @Autowired
-    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage, 
+    public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                       @Qualifier("userDbStorage") UserStorage userStorage) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
@@ -88,3 +88,4 @@ public class FilmService {
     }
 
 }
+
