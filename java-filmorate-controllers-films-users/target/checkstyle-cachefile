@@ -1,0 +1,13 @@
+#Fri Oct 03 15:24:53 MSK 2025
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/java/ru/yandex/practicum/filmorate/FilmorateApplication.java=1757117972000
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/java/ru/yandex/practicum/filmorate/controller/FilmController.java=1757117972000
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/java/ru/yandex/practicum/filmorate/controller/UserController.java=1757117972000
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/java/ru/yandex/practicum/filmorate/exception/ValidationException.java=1757117972000
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/java/ru/yandex/practicum/filmorate/model/Film.java=1759494020734
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/java/ru/yandex/practicum/filmorate/model/FriendshipStatus.java=1759494179386
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/java/ru/yandex/practicum/filmorate/model/Genre.java=1759494120290
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/java/ru/yandex/practicum/filmorate/model/MpaRating.java=1759494088994
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/java/ru/yandex/practicum/filmorate/model/User.java=1759494043421
+/Users/varvara/Downloads/java-filmorate-controllers-films-users/src/main/resources/application.properties=1757117972000
+configuration*?=FE055961EADEC53435C87AD99A390FBC9CBBDDCB
+module-resource*?\:suppressions.xml=B6C56B864127A55986A2D096B53D68E97E9F54B7
