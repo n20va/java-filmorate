@@ -18,7 +18,6 @@ import java.util.Optional;
 import java.util.LinkedHashSet;
 import java.util.Objects;
 
-
 @Repository("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
 
@@ -38,10 +37,7 @@ public class FilmDbStorage implements FilmStorage {
                 .duration(rs.getInt("duration"))
                 .build();
 
-        Integer mpaId = rs.getInt("mpa_id");
-        if (mpaId != 0) {
-        }
-
+        // MPA будет загружен позже в отдельном методе
         return film;
     };
 
@@ -147,13 +143,14 @@ public class FilmDbStorage implements FilmStorage {
     private void loadFilmMpa(Film film) {
         String sql = "SELECT mpa_id FROM films WHERE film_id = ?";
         Integer mpaId = jdbcTemplate.queryForObject(sql, Integer.class, film.getId());
-
+        
         if (mpaId != null && mpaId != 0) {
             String mpaSql = "SELECT * FROM mpa_ratings WHERE mpa_id = ?";
             try {
                 MpaRating mpa = jdbcTemplate.queryForObject(mpaSql, mpaRowMapper, mpaId);
                 film.setMpa(mpa);
             } catch (Exception e) {
+                System.out.println("MPA rating not found for id: " + mpaId);
             }
         }
     }
