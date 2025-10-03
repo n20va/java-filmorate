@@ -137,6 +137,7 @@ public class FilmDbStorage implements FilmStorage {
         loadFilmGenres(film);
         return Optional.of(film);
     }
+
     @Override
     public RowMapper<Film> getFilmRowMapper() {
         return filmRowMapper;
@@ -164,7 +165,3 @@ public class FilmDbStorage implements FilmStorage {
         film.setGenres(new LinkedHashSet<>(genres));
     }
 }
-
-
-
-
