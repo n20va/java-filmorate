@@ -65,10 +65,8 @@ public class InMemoryUserStorage implements UserStorage {
     public List<User> getCommonFriends(int userId, int otherId) {
         Set<Integer> userFriends = friends.getOrDefault(userId, new HashSet<>());
         Set<Integer> otherFriends = friends.getOrDefault(otherId, new HashSet<>());
-        
         Set<Integer> commonFriendIds = new HashSet<>(userFriends);
         commonFriendIds.retainAll(otherFriends);
-        
         List<User> commonFriends = new ArrayList<>();
         for (Integer friendId : commonFriendIds) {
             getUserById(friendId).ifPresent(commonFriends::add);
@@ -76,3 +74,4 @@ public class InMemoryUserStorage implements UserStorage {
         return commonFriends;
     }
 }
+
