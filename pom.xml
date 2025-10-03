@@ -68,6 +68,12 @@
             <artifactId>gson</artifactId>
             <version>${gson.version}</version>
         </dependency>
+
+         ‹dependency>
+             <groupld>org.springframework.boot</groupld>
+             <artifactld>spring-boot-starter-actuator</artifactld>
+         </dependency>
+             
     </dependencies>
 
     <build>
