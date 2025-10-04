@@ -43,9 +43,7 @@ class FilmDbStorageTest {
         Optional<Film> foundFilm = filmStorage.getFilmById(addedFilm.getId());
         assertThat(foundFilm)
                 .isPresent()
-                .hasValueSatisfying(f -> 
-                    assertThat(f).hasFieldOrPropertyWithValue("id", addedFilm.getId())
-                );
+                .hasValueSatisfying(f -> assertThat(f).hasFieldOrPropertyWithValue("id", addedFilm.getId()));
     }
 
     @Test
@@ -79,3 +77,4 @@ class FilmDbStorageTest {
         assertThat(films).hasSize(2);
     }
 }
+
