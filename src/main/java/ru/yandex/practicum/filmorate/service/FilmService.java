@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -11,27 +12,29 @@ import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Slf4j
 @Service
 public class FilmService {
     private final FilmStorage filmStorage;
     private final UserStorage userStorage;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
-                       @Qualifier("userDbStorage") UserStorage userStorage) {
+                      @Qualifier("userDbStorage") UserStorage userStorage,
+                      JdbcTemplate jdbcTemplate) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
+        this.jdbcTemplate = jdbcTemplate;
     }
-
 
     public void addLike(int filmId, int userId) {
         getFilmOrThrow(filmId);
         getUserOrThrow(userId);
 
         String sql = "MERGE INTO film_likes (film_id, user_id) KEY(film_id, user_id) VALUES (?, ?)";
+        jdbcTemplate.update(sql, filmId, userId);
         log.info("Пользователь с id={} поставил лайк фильму с id={}", userId, filmId);
     }
 
@@ -40,6 +43,7 @@ public class FilmService {
         getUserOrThrow(userId);
 
         String sql = "DELETE FROM film_likes WHERE film_id = ? AND user_id = ?";
+        jdbcTemplate.update(sql, filmId, userId);
         log.info("Пользователь с id={} удалил лайк с фильма с id={}", userId, filmId);
     }
 
@@ -48,12 +52,16 @@ public class FilmService {
             throw new ValidationException("Параметр count должен быть положительным");
         }
 
-        String sql = "SELECT f.*, COUNT(fl.user_id) as likes_count " +
-                "FROM films f LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
-                "GROUP BY f.film_id ORDER BY likes_count DESC LIMIT ?";
-        return filmStorage.getAllFilms().stream()
-                .limit(count)
-                .collect(Collectors.toList());
+        String sql = "SELECT f.* FROM films f " +
+                "LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
+                "GROUP BY f.film_id ORDER BY COUNT(fl.user_id) DESC LIMIT ?";
+        List<Film> films = jdbcTemplate.query(sql, filmStorage.getFilmRowMapper(), count);
+        for (int i = 0; i < films.size(); i++) {
+            Film film = films.get(i);
+            Film fullFilm = filmStorage.getFilmById(film.getId()).orElse(film);
+            films.set(i, fullFilm);
+        }
+        return films;
     }
 
     private Film getFilmOrThrow(int filmId) {
@@ -87,3 +95,5 @@ public class FilmService {
         return getFilmOrThrow(id);
     }
 }
+
+
