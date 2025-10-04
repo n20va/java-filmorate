@@ -61,7 +61,6 @@ public class FilmService {
             Film fullFilm = filmStorage.getFilmById(film.getId()).orElse(film);
             films.set(i, fullFilm);
         }
-        
         return films;
     }
 
@@ -96,4 +95,5 @@ public class FilmService {
         return getFilmOrThrow(id);
     }
 }
+
 
