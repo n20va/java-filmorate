@@ -7,12 +7,14 @@ import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
 import ru.yandex.practicum.filmorate.model.Film;
+import ru.yandex.practicum.filmorate.model.Genre;
 import ru.yandex.practicum.filmorate.storage.FilmStorage;
 import ru.yandex.practicum.filmorate.storage.UserStorage;
 import ru.yandex.practicum.filmorate.storage.MpaDao;
 import ru.yandex.practicum.filmorate.storage.GenreDao;
 
-import java.util.List;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @Service
@@ -50,7 +52,9 @@ public class FilmService {
         if (count <= 0) {
             throw new ValidationException("Параметр count должен быть положительным");
         }
-        return filmStorage.getPopularFilms(count);
+        List<Film> films = filmStorage.getPopularFilms(count);
+        loadGenresForFilms(films);
+        return films;
     }
 
     private Film getFilmOrThrow(int filmId) {
@@ -68,13 +72,7 @@ public class FilmService {
             mpaDao.getMpaById(film.getMpa().getId())
                     .orElseThrow(() -> new NotFoundException("Рейтинг MPA с id=" + film.getMpa().getId() + " не найден"));
         }
-
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                genreDao.getGenreById(genre.getId())
-                        .orElseThrow(() -> new NotFoundException("Жанр с id=" + genre.getId() + " не найден"));
-            }
-        }
+        validateGenres(film.getGenres());
 
         Film addedFilm = filmStorage.addFilm(film);
         log.info("Добавлен фильм: {}", addedFilm);
@@ -83,18 +81,11 @@ public class FilmService {
 
     public Film updateFilm(Film film) {
         getFilmOrThrow(film.getId());
-
         if (film.getMpa() != null) {
             mpaDao.getMpaById(film.getMpa().getId())
                     .orElseThrow(() -> new NotFoundException("Рейтинг MPA с id=" + film.getMpa().getId() + " не найден"));
         }
-
-        if (film.getGenres() != null && !film.getGenres().isEmpty()) {
-            for (Genre genre : film.getGenres()) {
-                genreDao.getGenreById(genre.getId())
-                        .orElseThrow(() -> new NotFoundException("Жанр с id=" + genre.getId() + " не найден"));
-            }
-        }
+        validateGenres(film.getGenres());
 
         Film updatedFilm = filmStorage.updateFilm(film);
         log.info("Обновлен фильм: {}", updatedFilm);
@@ -102,11 +93,51 @@ public class FilmService {
     }
 
     public List<Film> getAllFilms() {
-        return filmStorage.getAllFilms();
+        List<Film> films = filmStorage.getAllFilms();
+        loadGenresForFilms(films);
+        return films;
     }
 
     public Film getFilmById(int id) {
         log.debug("Получен запрос на получение фильма с ID: {}", id);
-        return getFilmOrThrow(id);
+        Film film = getFilmOrThrow(id);
+        loadGenresForFilms(Collections.singletonList(film));
+        return film;
+    }
+
+    private void validateGenres(Set<Genre> genres) {
+        if (genres != null && !genres.isEmpty()) {
+            for (Genre genre : genres) {
+                genreDao.getGenreById(genre.getId())
+                        .orElseThrow(() -> new NotFoundException("Жанр с id=" + genre.getId() + " не найден"));
+            }
+        }
+    }
+
+    private void loadGenresForFilms(List<Film> films) {
+        if (films.isEmpty()) return;
+
+        List<Integer> filmIds = films.stream()
+                .map(Film::getId)
+                .collect(Collectors.toList());
+        Map<Integer, Film> filmMap = films.stream()
+                .collect(Collectors.toMap(Film::getId, film -> film));
+        String inClause = String.join(",", Collections.nCopies(filmIds.size(), "?"));
+        String sql = String.format(
+                "SELECT fg.film_id, g.genre_id, g.name " +
+                "FROM film_genres fg " +
+                "JOIN genres g ON fg.genre_id = g.genre_id " +
+                "WHERE fg.film_id IN (%s) " +
+                "ORDER BY fg.film_id, g.genre_id", inClause);
+        genreDao.getJdbcTemplate().query(sql, filmIds.toArray(), rs -> {
+            int filmId = rs.getInt("film_id");
+            Film film = filmMap.get(filmId);
+            if (film != null) {
+                Genre genre = new Genre();
+                genre.setId(rs.getInt("genre_id"));
+                genre.setName(rs.getString("name"));
+                film.getGenres().add(genre);
+            }
+        });
     }
 }
