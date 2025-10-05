@@ -6,7 +6,6 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.Film;
-import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.model.Genre;
 
 import java.sql.PreparedStatement;
@@ -130,15 +129,12 @@ public class FilmDbStorage implements FilmStorage {
 
     private void loadGenresForFilms(List<Film> films) {
         if (films.isEmpty()) return;
-        
         String inClause = String.join(",", Collections.nCopies(films.size(), "?"));
         String sql = String.format("SELECT fg.film_id, g.genre_id, g.name FROM film_genres fg " +
                 "JOIN genres g ON fg.genre_id = g.genre_id " +
                 "WHERE fg.film_id IN (%s) ORDER BY fg.film_id, g.genre_id", inClause);
-        
         List<Integer> filmIds = films.stream().map(Film::getId).collect(Collectors.toList());
         Map<Integer, Film> filmMap = films.stream().collect(Collectors.toMap(Film::getId, film -> film));
-        
         jdbcTemplate.query(sql, filmIds.toArray(), rs -> {
             int filmId = rs.getInt("film_id");
             Film film = filmMap.get(filmId);
@@ -151,3 +147,4 @@ public class FilmDbStorage implements FilmStorage {
         });
     }
 }
+
