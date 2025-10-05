@@ -78,8 +78,8 @@ public class FilmService {
                     .orElseThrow(() -> new NotFoundException("Рейтинг MPA с id=" + film.getMpa().getId() + " не найден"));
         }
         validateGenres(film.getGenres());
-
         Film addedFilm = filmStorage.addFilm(film);
+        loadGenresForFilms(Collections.singletonList(addedFilm));
         log.info("Добавлен фильм: {}", addedFilm);
         return addedFilm;
     }
@@ -93,6 +93,7 @@ public class FilmService {
         validateGenres(film.getGenres());
 
         Film updatedFilm = filmStorage.updateFilm(film);
+        loadGenresForFilms(Collections.singletonList(updatedFilm));
         log.info("Обновлен фильм: {}", updatedFilm);
         return updatedFilm;
     }
@@ -122,11 +123,9 @@ public class FilmService {
         if (filmStorage instanceof ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage) {
             return;
         }
-
         List<Integer> filmIds = films.stream()
                 .map(Film::getId)
                 .collect(Collectors.toList());
-
         Map<Integer, Film> filmMap = films.stream()
                 .collect(Collectors.toMap(Film::getId, film -> film));
         String inClause = String.join(",", Collections.nCopies(filmIds.size(), "?"));
@@ -136,7 +135,6 @@ public class FilmService {
                 "JOIN genres g ON fg.genre_id = g.genre_id " +
                 "WHERE fg.film_id IN (%s) " +
                 "ORDER BY fg.film_id, g.genre_id", inClause);
-
         jdbcTemplate.query(sql, filmIds.toArray(), rs -> {
             int filmId = rs.getInt("film_id");
             Film film = filmMap.get(filmId);
