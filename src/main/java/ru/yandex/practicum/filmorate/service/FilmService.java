@@ -3,6 +3,7 @@ package ru.yandex.practicum.filmorate.service;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.stereotype.Service;
 import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.exception.ValidationException;
@@ -23,15 +24,17 @@ public class FilmService {
     private final UserStorage userStorage;
     private final MpaDao mpaDao;
     private final GenreDao genreDao;
+    private final JdbcTemplate jdbcTemplate;
 
     @Autowired
     public FilmService(@Qualifier("filmDbStorage") FilmStorage filmStorage,
                       @Qualifier("userDbStorage") UserStorage userStorage,
-                      MpaDao mpaDao, GenreDao genreDao) {
+                      MpaDao mpaDao, GenreDao genreDao, JdbcTemplate jdbcTemplate) {
         this.filmStorage = filmStorage;
         this.userStorage = userStorage;
         this.mpaDao = mpaDao;
         this.genreDao = genreDao;
+        this.jdbcTemplate = jdbcTemplate;
     }
 
     public void addLike(int filmId, int userId) {
