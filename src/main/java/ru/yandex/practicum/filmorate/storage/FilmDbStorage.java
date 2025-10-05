@@ -12,7 +12,6 @@ import java.sql.PreparedStatement;
 import java.sql.Types;
 import java.sql.Date;
 import java.util.*;
-import java.util.stream.Collectors;
 
 @Repository("filmDbStorage")
 public class FilmDbStorage implements FilmStorage {
@@ -116,3 +115,4 @@ public class FilmDbStorage implements FilmStorage {
         return jdbcTemplate.query(sql, filmRowMapper, count);
     }
 }
+
