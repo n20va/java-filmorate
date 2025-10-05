@@ -85,23 +85,14 @@ public class FilmDbStorage implements FilmStorage {
     @Override
     public List<Film> getAllFilms() {
         String sql = "SELECT f.*, m.name AS mpa_name FROM films f LEFT JOIN mpa_ratings m ON f.mpa_id = m.mpa_id";
-        List<Film> films = jdbcTemplate.query(sql, filmRowMapper);
-        loadGenresForFilms(films);
-        return films;
+        return jdbcTemplate.query(sql, filmRowMapper);
     }
 
     @Override
     public Optional<Film> getFilmById(int id) {
         String sql = "SELECT f.*, m.name AS mpa_name FROM films f LEFT JOIN mpa_ratings m ON f.mpa_id = m.mpa_id WHERE f.film_id = ?";
         List<Film> films = jdbcTemplate.query(sql, filmRowMapper, id);
-
-        if (films.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Film film = films.get(0);
-        loadGenresForFilms(Collections.singletonList(film));
-        return Optional.of(film);
+        return films.isEmpty() ? Optional.empty() : Optional.of(films.get(0));
     }
 
     @Override
@@ -122,29 +113,6 @@ public class FilmDbStorage implements FilmStorage {
                 "LEFT JOIN mpa_ratings m ON f.mpa_id = m.mpa_id " +
                 "LEFT JOIN film_likes fl ON f.film_id = fl.film_id " +
                 "GROUP BY f.film_id ORDER BY COUNT(fl.user_id) DESC LIMIT ?";
-        List<Film> films = jdbcTemplate.query(sql, filmRowMapper, count);
-        loadGenresForFilms(films);
-        return films;
-    }
-
-    private void loadGenresForFilms(List<Film> films) {
-        if (films.isEmpty()) return;
-        String inClause = String.join(",", Collections.nCopies(films.size(), "?"));
-        String sql = String.format("SELECT fg.film_id, g.genre_id, g.name FROM film_genres fg " +
-                "JOIN genres g ON fg.genre_id = g.genre_id " +
-                "WHERE fg.film_id IN (%s) ORDER BY fg.film_id, g.genre_id", inClause);
-        List<Integer> filmIds = films.stream().map(Film::getId).collect(Collectors.toList());
-        Map<Integer, Film> filmMap = films.stream().collect(Collectors.toMap(Film::getId, film -> film));
-        jdbcTemplate.query(sql, filmIds.toArray(), rs -> {
-            int filmId = rs.getInt("film_id");
-            Film film = filmMap.get(filmId);
-            if (film != null) {
-                Genre genre = new Genre();
-                genre.setId(rs.getInt("genre_id"));
-                genre.setName(rs.getString("name"));
-                film.getGenres().add(genre);
-            }
-        });
+        return jdbcTemplate.query(sql, filmRowMapper, count);
     }
 }
-
