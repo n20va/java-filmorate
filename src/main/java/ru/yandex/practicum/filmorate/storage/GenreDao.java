@@ -36,4 +36,8 @@ public class GenreDao {
         List<Genre> genres = jdbcTemplate.query(sql, genreRowMapper, id);
         return genres.isEmpty() ? Optional.empty() : Optional.of(genres.get(0));
     }
+
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
 }
