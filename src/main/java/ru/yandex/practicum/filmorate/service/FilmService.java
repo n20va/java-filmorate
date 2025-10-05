@@ -58,8 +58,10 @@ public class FilmService {
     }
 
     private Film getFilmOrThrow(int filmId) {
-        return filmStorage.getFilmById(filmId)
+        Film film = filmStorage.getFilmById(filmId)
                 .orElseThrow(() -> new NotFoundException("Фильм с id=" + filmId + " не найден"));
+        loadGenresForFilms(Collections.singletonList(film));
+        return film;
     }
 
     private void getUserOrThrow(int userId) {
@@ -100,9 +102,7 @@ public class FilmService {
 
     public Film getFilmById(int id) {
         log.debug("Получен запрос на получение фильма с ID: {}", id);
-        Film film = getFilmOrThrow(id);
-        loadGenresForFilms(Collections.singletonList(film));
-        return film;
+        return getFilmOrThrow(id);
     }
 
     private void validateGenres(Set<Genre> genres) {
@@ -116,10 +116,14 @@ public class FilmService {
 
     private void loadGenresForFilms(List<Film> films) {
         if (films.isEmpty()) return;
+        if (filmStorage instanceof ru.yandex.practicum.filmorate.storage.InMemoryFilmStorage) {
+            return;
+        }
 
         List<Integer> filmIds = films.stream()
                 .map(Film::getId)
                 .collect(Collectors.toList());
+
         Map<Integer, Film> filmMap = films.stream()
                 .collect(Collectors.toMap(Film::getId, film -> film));
         String inClause = String.join(",", Collections.nCopies(filmIds.size(), "?"));
@@ -129,7 +133,8 @@ public class FilmService {
                 "JOIN genres g ON fg.genre_id = g.genre_id " +
                 "WHERE fg.film_id IN (%s) " +
                 "ORDER BY fg.film_id, g.genre_id", inClause);
-        genreDao.getJdbcTemplate().query(sql, filmIds.toArray(), rs -> {
+
+        jdbcTemplate.query(sql, filmIds.toArray(), rs -> {
             int filmId = rs.getInt("film_id");
             Film film = filmMap.get(filmId);
             if (film != null) {
