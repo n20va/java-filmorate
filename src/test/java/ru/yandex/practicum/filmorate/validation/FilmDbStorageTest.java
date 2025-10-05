@@ -9,6 +9,7 @@ import org.springframework.context.annotation.Import;
 import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.FilmDbStorage;
+import ru.yandex.practicum.filmorate.storage.FilmRowMapper;
 import ru.yandex.practicum.filmorate.storage.MpaDao;
 import ru.yandex.practicum.filmorate.storage.GenreDao;
 
@@ -21,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({FilmDbStorage.class, MpaDao.class, GenreDao.class})
+@Import({FilmDbStorage.class, FilmRowMapper.class, MpaDao.class, GenreDao.class})
 class FilmDbStorageTest {
 
     private final FilmDbStorage filmStorage;
@@ -77,4 +78,3 @@ class FilmDbStorageTest {
         assertThat(films).hasSize(2);
     }
 }
-
