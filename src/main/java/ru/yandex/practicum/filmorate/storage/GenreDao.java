@@ -13,18 +13,18 @@ import java.util.Optional;
 public class GenreDao {
 
     private final JdbcTemplate jdbcTemplate;
+    private final RowMapper<Genre> genreRowMapper;
 
     @Autowired
     public GenreDao(JdbcTemplate jdbcTemplate) {
         this.jdbcTemplate = jdbcTemplate;
+        this.genreRowMapper = (rs, rowNum) -> {
+            Genre genre = new Genre();
+            genre.setId(rs.getInt("genre_id"));
+            genre.setName(rs.getString("name"));
+            return genre;
+        };
     }
-
-    private final RowMapper<Genre> genreRowMapper = (rs, rowNum) -> {
-        Genre genre = new Genre();
-        genre.setId(rs.getInt("genre_id"));
-        genre.setName(rs.getString("name"));
-        return genre;
-    };
 
     public List<Genre> getAllGenres() {
         String sql = "SELECT * FROM genres ORDER BY genre_id";
