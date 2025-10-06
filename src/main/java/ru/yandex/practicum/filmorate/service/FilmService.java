@@ -67,6 +67,7 @@ public class FilmService {
         userStorage.getUserById(userId)
                 .orElseThrow(() -> new NotFoundException("Пользователь с id=" + userId + " не найден"));
     }
+    
     public Film addFilm(Film film) {
         if (film.getMpa() != null) {
             mpaService.getMpaById(film.getMpa().getId());
@@ -109,3 +110,4 @@ public class FilmService {
         }
     }
 }
+
