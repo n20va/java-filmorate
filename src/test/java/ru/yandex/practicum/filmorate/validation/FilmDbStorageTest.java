@@ -10,8 +10,8 @@ import ru.yandex.practicum.filmorate.model.Film;
 import ru.yandex.practicum.filmorate.model.MpaRating;
 import ru.yandex.practicum.filmorate.storage.FilmDbStorage;
 import ru.yandex.practicum.filmorate.storage.FilmRowMapper;
-import ru.yandex.practicum.filmorate.storage.MpaDao;
-import ru.yandex.practicum.filmorate.storage.GenreDao;
+import ru.yandex.practicum.filmorate.storage.MpaDbStorage;
+import ru.yandex.practicum.filmorate.storage.GenreDbStorage;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -22,7 +22,7 @@ import static org.assertj.core.api.Assertions.assertThat;
 @JdbcTest
 @AutoConfigureTestDatabase
 @RequiredArgsConstructor(onConstructor_ = @Autowired)
-@Import({FilmDbStorage.class, FilmRowMapper.class, MpaDao.class, GenreDao.class})
+@Import({FilmDbStorage.class, FilmRowMapper.class, MpaDbStorage.class, GenreDbStorage.class})
 class FilmDbStorageTest {
 
     private final FilmDbStorage filmStorage;
