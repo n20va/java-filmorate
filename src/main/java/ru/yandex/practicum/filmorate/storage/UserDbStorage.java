@@ -7,11 +7,12 @@ import org.springframework.jdbc.support.GeneratedKeyHolder;
 import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 import ru.yandex.practicum.filmorate.model.User;
-import ru.yandex.practicum.filmorate.model.FriendshipStatus;
 
-import java.sql.*;
+import java.sql.PreparedStatement;
 import java.sql.Date;
-import java.util.*;
+import java.util.List;
+import java.util.Optional;
+import java.util.Objects;
 
 @Repository("userDbStorage")
 public class UserDbStorage implements UserStorage {
@@ -45,7 +46,7 @@ public class UserDbStorage implements UserStorage {
         KeyHolder keyHolder = new GeneratedKeyHolder();
 
         jdbcTemplate.update(connection -> {
-            PreparedStatement stmt = connection.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS);
+            PreparedStatement stmt = connection.prepareStatement(sql, new String[]{"user_id"});
             stmt.setString(1, user.getEmail());
             stmt.setString(2, user.getLogin());
             stmt.setString(3, user.getName());
@@ -53,7 +54,7 @@ public class UserDbStorage implements UserStorage {
             return stmt;
         }, keyHolder);
 
-        int userId = keyHolder.getKey().intValue();
+        int userId = Objects.requireNonNull(keyHolder.getKey()).intValue();
         user.setId(userId);
 
         return getUserById(userId).orElse(user);
@@ -83,5 +84,34 @@ public class UserDbStorage implements UserStorage {
         String sql = "SELECT * FROM users WHERE user_id = ?";
         List<User> users = jdbcTemplate.query(sql, userRowMapper, id);
         return users.isEmpty() ? Optional.empty() : Optional.of(users.get(0));
+    }
+
+    @Override
+    public void addFriend(int userId, int friendId) {
+        String sql = "INSERT INTO friendships (user_id, friend_id, status) VALUES (?, ?, 'CONFIRMED')";
+        jdbcTemplate.update(sql, userId, friendId);
+    }
+
+    @Override
+    public void removeFriend(int userId, int friendId) {
+        String sql = "DELETE FROM friendships WHERE user_id = ? AND friend_id = ?";
+        jdbcTemplate.update(sql, userId, friendId);
+    }
+
+    @Override
+    public List<User> getFriends(int userId) {
+        String sql = "SELECT u.* FROM users u " +
+                    "JOIN friendships f ON u.user_id = f.friend_id " +
+                    "WHERE f.user_id = ?";
+        return jdbcTemplate.query(sql, userRowMapper, userId);
+    }
+
+    @Override
+    public List<User> getCommonFriends(int userId, int otherId) {
+        String sql = "SELECT u.* FROM users u " +
+                    "JOIN friendships f1 ON u.user_id = f1.friend_id " +
+                    "JOIN friendships f2 ON u.user_id = f2.friend_id " +
+                    "WHERE f1.user_id = ? AND f2.user_id = ?";
+        return jdbcTemplate.query(sql, userRowMapper, userId, otherId);
     }
 }

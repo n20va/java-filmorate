@@ -1,36 +1,30 @@
 package ru.yandex.practicum.filmorate.controller;
 
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
-import ru.yandex.practicum.filmorate.exception.NotFoundException;
 import ru.yandex.practicum.filmorate.model.Genre;
-import ru.yandex.practicum.filmorate.storage.GenreDao;
+import ru.yandex.practicum.filmorate.service.GenreService;
 
 import java.util.List;
 
-@Slf4j
 @RestController
 @RequestMapping("/genres")
 public class GenreController {
 
-    private final GenreDao genreDao;
+    private final GenreService genreService;
 
     @Autowired
-    public GenreController(GenreDao genreDao) {
-        this.genreDao = genreDao;
+    public GenreController(GenreService genreService) {
+        this.genreService = genreService;
     }
 
     @GetMapping
     public List<Genre> getAllGenres() {
-        log.info("Получен запрос на получение всех жанров");
-        return genreDao.getAllGenres();
+        return genreService.getAllGenres();
     }
 
     @GetMapping("/{id}")
     public Genre getGenreById(@PathVariable int id) {
-        log.info("Получен запрос на получение жанра с id={}", id);
-        return genreDao.getGenreById(id)
-                .orElseThrow(() -> new NotFoundException("Жанр с id=" + id + " не найден"));
+        return genreService.getGenreById(id);
     }
 }
